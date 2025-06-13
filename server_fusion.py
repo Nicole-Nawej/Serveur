@@ -222,5 +222,5 @@ def handle_disconnect():
             break
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 8765))
+    port = int(os.environ.get("PORT", 10000))
     socketio.run(app, host="0.0.0.0", port=port)
