@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><title>Test Socket.IO</title></head>
+<body>
+  <h1>Connexion Socket.IO</h1>
+  <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+  <script>
+    const socket = io("https://serveur-cz8s.onrender.com", {
+      transports: ["websocket"]
+    });
+
+    socket.on("connect", () => {
+      console.log("✅ Connecté au serveur !");
+      socket.emit("identify", {type: "flutter"});
+    });
+
+    socket.on("message", (data) => {
+      console.log("📩 Message reçu:", data);
+    });
+
+    socket.on("connect_error", (err) => {
+      console.error("❌ Erreur de connexion :", err.message);
+    });
+  </script>
+</body>
+</html>

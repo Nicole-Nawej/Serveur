@@ -33,7 +33,9 @@ stats = {
     "flutter_to_raspberry": [],
     "mission_state": "idle",
     "last_command": None,
-    "signal_loss_mode": "return_home"
+    "signal_loss_mode": "return_home",
+    "flutter_sent": [],
+    "raspberry_sent": [],
 }
 
 def save_stats():
@@ -92,6 +94,31 @@ TEMPLATE = """
     <table>
         <tr><th>Date/Heure</th><th>Données</th></tr>
         {% for msg in stats.get('flutter_to_raspberry', []) %}
+        <tr>
+            <td>{{ msg.timestamp }}</td>
+            <td><pre>{{ msg.data | tojson(indent=2) }}</pre></td>
+        </tr>
+        {% else %}
+        <tr><td colspan="2" class="none">Aucun message</td></tr>
+        {% endfor %}
+    </table>
+    <h2>Messages envoyés par l'application (Flutter)</h2>
+    <table>
+        <tr><th>Date/Heure</th><th>Données</th></tr>
+        {% for msg in stats.get('flutter_sent', []) %}
+        <tr>
+            <td>{{ msg.timestamp }}</td>
+            <td><pre>{{ msg.data | tojson(indent=2) }}</pre></td>
+        </tr>
+        {% else %}
+        <tr><td colspan="2" class="none">Aucun message</td></tr>
+        {% endfor %}
+    </table>
+
+    <h2>Messages envoyés par la Raspberry</h2>
+    <table>
+        <tr><th>Date/Heure</th><th>Données</th></tr>
+        {% for msg in stats.get('raspberry_sent', []) %}
         <tr>
             <td>{{ msg.timestamp }}</td>
             <td><pre>{{ msg.data | tojson(indent=2) }}</pre></td>
@@ -212,6 +239,19 @@ def handle_message(data):
         socketio.emit("message", data, room=clients[target])
     else:
         emit("error", {"message": f"{target} not connected"})
+
+    # Ajoute à l'historique des messages envoyés
+    entry = {
+        "timestamp": now,
+        "data": data
+    }
+    if client_type == "raspberry":
+        stats["raspberry_sent"].append(entry)
+        stats["raspberry_sent"] = stats["raspberry_sent"][-10:]
+    elif client_type == "flutter":
+        stats["flutter_sent"].append(entry)
+        stats["flutter_sent"] = stats["flutter_sent"][-10:]
+    save_stats()
 
 @socketio.on('disconnect')
 def handle_disconnect():
