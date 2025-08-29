@@ -210,6 +210,13 @@ def handle_message(data):
     # Gestion Flutter
     elif client_type == "flutter":
         stats["flutter_messages"] += 1
+        # Ajoute à l'historique des messages envoyés par Flutter
+        entry = {
+            "timestamp": now,
+            "data": data
+        }
+        stats["flutter_sent"].append(entry)
+        stats["flutter_sent"] = stats["flutter_sent"][-10:]
         if action == "command":
             command = data.get("command")
             if command == "set_signal_loss_mode":
@@ -255,7 +262,7 @@ def handle_message(data):
     else:
         emit("error", {"message": f"{target} not connected"})
 
-    # Ajoute à l'historique des messages envoyés
+"""    # Ajoute à l'historique des messages envoyés
     entry = {
         "timestamp": now,
         "data": data
@@ -267,7 +274,7 @@ def handle_message(data):
         stats["flutter_sent"].append(entry)
         stats["flutter_sent"] = stats["flutter_sent"][-10:]
     save_stats()
-
+"""
 @socketio.on('disconnect')
 def handle_disconnect():
     for k, v in list(clients.items()):
@@ -279,3 +286,5 @@ def handle_disconnect():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
     socketio.run(app, host="0.0.0.0", port=port)
+
+    
