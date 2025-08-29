@@ -75,8 +75,23 @@ TEMPLATE = """
                 {% endif %}
             </td>
         </tr>
+        <tr><th>Dernier GPS Flutter</th>
+            <td>
+                {% if stats['last_flutter_latitude'] and stats['last_flutter_longitude'] %}
+                    Lat: {{ stats['last_flutter_latitude'] }}, Lon: {{ stats['last_flutter_longitude'] }}
+                {% else %}
+                    <span class="none">Aucune donnée</span>
+                {% endif %}
+            </td>
+        </tr>
         <tr><th>Mission State</th><td>{{ stats['mission_state'] }}</td></tr>
         <tr><th>Signal Loss Mode</th><td>{{ stats['signal_loss_mode'] }}</td></tr>
+        <tr><th>Raspberry connectée</th>
+            <td>{{ "Oui" if clients.get("raspberry") else "Non" }}</td>
+        </tr>
+        <tr><th>Flutter connectée</th>
+            <td>{{ "Oui" if clients.get("flutter") else "Non" }}</td>
+        </tr>
     </table>
     <h2>Historique Raspberry → Flutter</h2>
     <table>
@@ -133,7 +148,7 @@ TEMPLATE = """
 
 @app.route("/")
 def dashboard():
-    return render_template_string(TEMPLATE, stats=stats)
+    return render_template_string(TEMPLATE, stats=stats, clients=clients)
 
 # WebSocket: identification
 @socketio.on('identify')
