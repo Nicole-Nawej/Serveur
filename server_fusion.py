@@ -242,6 +242,7 @@ def handle_message(data):
             stats["last_flutter_latitude"] = data.get("latitude")
             stats["last_flutter_longitude"] = data.get("longitude")
             stats["last_flutter_gps_time"] = now
+            print(f"GPS Flutter reçu: {stats['last_flutter_latitude']}, {stats['last_flutter_longitude']}")
         save_stats()
 
     # Relais des messages
@@ -287,4 +288,3 @@ if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
     socketio.run(app, host="0.0.0.0", port=port)
 
-    
